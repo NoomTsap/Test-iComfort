@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>iComfort · Sensori</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #ffffff;
+  --surface: #f4f5f7;
+  --surface-2: #f0f0f2;
+  --border: #cacacc;
+  --border-soft: #b1b1b3;
+
+  --accent: #3eb3a8;
+  --accent-dark: #2c8f87;
+  --accent-light: #6fd1c7;
+  --accent-glow: rgba(62,179,168,0.4);
+
+  --warn: #ffaa00;
+  --error: #ff4d4d;
+
+  --text: #d7ecea;
+  --muted: #6c8f8c;
+
+  --mono: 'Share Tech Mono', monospace;
+  --sans: 'Barlow', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 13px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Scanline overlay */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,212,170,0.015) 2px,
+    rgba(0,212,170,0.015) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.logo {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.status-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent-glow);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 10px var(--accent-glow); }
+  50% { opacity: 0.5; box-shadow: 0 0 4px var(--accent-glow); }
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+}
+
+#last-update {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 10px;
+}
+
+main {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* SENSOR GRID */
+#sensor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.sensor-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 14px 14px 12px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.25s;
+}
+
+.sensor-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0.7;
+}
+
+.sensor-card:hover {
+  border-color: var(--accent);
+  background: var(--surface-2);
+}
+
+.sensor-name {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.sensor-value {
+  font-family: var(--mono);
+  font-size: 26px;
+  font-weight: 400;
+  color: #ffffff;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.sensor-unit {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+}
+
+.sensor-time {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--muted);
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+/* Loading skeleton */
+.skeleton {
+  background: linear-gradient(90deg, var(--border) 25%, #1a2535 50%, var(--border) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 3px;
+  height: 26px;
+  width: 80%;
+  margin: 8px 0 4px;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* GRAPH SECTION */
+.section-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.graph-container {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.graph-container img {
+  width: 100%;
+  display: block;
+  filter: hue-rotate(5deg) saturate(1.15) contrast(1.05);
+}
+
+.graph-loading {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.spinner {
+  width: 24px; height: 24px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.error-msg {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--warn);
+  text-align: center;
+  padding: 20px;
+}
+
+.graph-refresh-info {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--muted);
+  text-align: right;
+  margin-top: 6px;
+}
+
+.btn-refresh {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  padding: 4px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-refresh:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">iComfort · Live Monitor</div>
+  <div class="header-right">
+    <span id="last-update">—</span>
+    <div class="status-dot" id="status-dot"></div>
+  </div>
+</header>
+
+<main>
+  <div>
+    <div class="section-label">Ultime rilevazioni</div>
+    <div id="sensor-grid">
+      <div class="sensor-card"><div class="sensor-name">CARICAMENTO</div><div class="skeleton"></div></div>
+      <div class="sensor-card"><div class="sensor-name">CARICAMENTO</div><div class="skeleton"></div></div>
+      <div class="sensor-card"><div class="sensor-name">CARICAMENTO</div><div class="skeleton"></div></div>
+    </div>
+  </div>
+
+  <div>
+    <div class="section-label">Temperatura · 48h</div>
+    <div class="graph-container" id="graph-container">
+      <div class="graph-loading" id="graph-loading">
+        <div class="spinner"></div>
+        <span>Generazione grafico...</span>
+      </div>
+    </div>
+    <div class="graph-refresh-info" id="graph-refresh-info"></div>
+  </div>
+</main>
+
+<script>
+const API_KEY  = '1CFB6C41-D487-44C8-B042-FB5B81563748';
+const GUID     = 'FF4EDEB4-D5B6-4B78-A8A1-B8F95FA079D7';
+const BASE_URL = 'https://api.icomfort.it';
+
+const ICONS = {
+  Temperature: '🌡',
+  Humidity: '💧',
+  Pressure: '⬤',
+  CO2: '💨',
+  VOC: '🔬',
+  Noise: '🔊',
+  Light: '☀',
+  PM25: '🌫',
+  PM10: '🌫',
+};
+
+function fmtTime(ts) {
+  try {
+    const d = new Date(ts);
+    return d.toLocaleString('it-IT', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+  } catch { return '—'; }
+}
+
+function fmtVal(v) {
+  if (v === null || v === undefined) return '—';
+  const n = parseFloat(v);
+  if (isNaN(n)) return String(v);
+  return n % 1 === 0 ? n.toFixed(0) : n.toFixed(1);
+}
+
+async function fetchSensors() {
+  const res = await fetch(`${BASE_URL}/api/Measure/GetLastMeasuresByEntity?guid=${GUID}`, {
+    headers: { 'Accept': 'application/json', 'Api-Key': API_KEY }
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+async function fetchGraph() {
+  const payload = {
+    Tags: ['Temperature', 'Actual'],
+    ElementGuid: GUID,
+    Params: { StartDate: '48 Hours Ago', EndDate: 'Now' },
+    GetBase64Image: false
+  };
+
+  const res = await fetch(`${BASE_URL}/GraphEngine/api/Graph/GetSpaceDataGraph`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Api-Key': API_KEY
+    },
+    body: JSON.stringify(payload)
+  });
+
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+function renderSensors(data) {
+  const grid = document.getElementById('sensor-grid');
+  if (!Array.isArray(data) || data.length === 0) {
+    grid.innerHTML = '<div class="error-msg">Nessun dato disponibile</div>';
+    return;
+  }
+
+  grid.innerHTML = data.map(s => `
+    <div class="sensor-card">
+      <div class="sensor-name">${ICONS[s.EventName] || '◈'} ${s.EventName}</div>
+      <div class="sensor-value">${fmtVal(s.Value)}</div>
+      <div class="sensor-unit">${s.Unity || ''}</div>
+      <div class="sensor-time">${fmtTime(s.LastMeasureTs)}</div>
+    </div>
+  `).join('');
+}
+
+function setStatus(ok) {
+  const dot = document.getElementById('status-dot');
+  dot.style.background = ok ? 'var(--accent)' : 'var(--warn)';
+  dot.style.boxShadow  = ok ? '0 0 10px var(--accent-glow)' : '0 0 8px var(--warn)';
+  document.getElementById('last-update').textContent =
+    'aggiornato ' + new Date().toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'});
+}
+
+async function loadSensors() {
+  try {
+    const data = await fetchSensors();
+    renderSensors(data);
+    setStatus(true);
+  } catch(e) {
+    document.getElementById('sensor-grid').innerHTML =
+      `<div class="error-msg">Errore sensori: ${e.message}</div>`;
+    setStatus(false);
+  }
+}
+
+loadSensors();
+setInterval(loadSensors, 120000);
+</script>
+
+</body>
+</html>
