@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>iComfort · Sensori</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Oswald:wght@200..700&display=swap" rel="stylesheet">
 
 <style>
@@ -96,6 +95,40 @@ header {
   font-size: 25px;
 }
 
+/* BOTTONE */
+.ricarica-pagina {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  background: var(--surface);
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ricarica-pagina:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+
+.ricarica-pagina:active {
+  transform: scale(0.97);
+}
+
+.ricarica-pagina:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-glow);
+}
+
 /* MAIN */
 main {
   padding: 16px 20px;
@@ -123,7 +156,18 @@ main {
   background: var(--border);
 }
 
+.bad-values{
+  font-family: var(--mono);
+  font-size: 14px;
+  color: red;
+  margin-top: 10px;
+}
+
 /* SENSOR GRID */
+
+.anomaly { color: red; }
+.correct { color: green; }
+
 #sensor-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -152,7 +196,7 @@ main {
 .sensor-value {
   font-family: var(--mono);
   font-size: 20px;
-  color: #222;
+  /*color: #222;*/
 }
 
 .sensor-time {
@@ -217,8 +261,9 @@ main {
 <header>
   <div class="logo">iComfort · Live Monitor</div>
   <div class="header-right">
-    <span id="last-update">—</span>
+    <span id="last-update"></span>
     <div class="status-dot"></div>
+    <button type="button" class="ricarica-pagina" id="ricarica-pagina">Ricarica pagina</button>
   </div>
 </header>
 
@@ -227,6 +272,7 @@ main {
   <div>
     <div class="section-label">Ultime rilevazioni</div>
     <div id="sensor-grid"></div>
+    <div class="bad-values" id="bad-values"></div>
   </div>
 
   <div>
@@ -245,6 +291,9 @@ main {
 const API_KEY  = '1CFB6C41-D487-44C8-B042-FB5B81563748';
 const GUID     = 'FF4EDEB4-D5B6-4B78-A8A1-B8F95FA079D7';
 const BASE_URL = 'https://api.icomfort.it';
+
+// Bottone per ricaricare la pagina
+document.getElementById("ricarica-pagina").addEventListener("click", function () {location.reload();});
 
 /* FORMAT */
 function fmtVal(v) {
@@ -266,26 +315,133 @@ async function fetchSensors() {
 /* RENDER SENSORS */
 function renderSensors(data) {
   const grid = document.getElementById('sensor-grid');
-
   const list = data?.MeasuresList;
+  var renderSensori = ""
+
+  var isAnomalo = [false, false, false, false, false, false, false, false, false, false, false, false]
+  const valoreAnomalo = document.getElementById('bad-values');
+  var stringValoreAnomalo = "";
 
   if (!Array.isArray(list)) {
+
     grid.innerHTML = '<div class="error-msg">Errore dati</div>';
     console.log('API response:', data);
     return;
-  }
+  } else if (list.length === 0) {
 
-  if (list.length === 0) {
     grid.innerHTML = '<div class="error-msg">Nessuna misura disponibile</div>';
     return;
-  }
+  } else {
 
-  grid.innerHTML = list.map(s => `
-    <div class="sensor-card">
-      <div class="sensor-name">${s.EventName ?? '—'}</div>
-      <div class="sensor-value">${fmtVal(s.Value)}</div>
-    </div>
-  `).join('');
+    // If che controllano se i valori sono troppo alti/bassi e danno un'avviso in caso lo siano
+    if(list[0].Value > 1000){ // NuvapIndex
+      
+      stringValoreAnomalo += "<br>(NuvapIndex) Valori dell’indice Nuvap troppo alti, l’aria è inquinata e potrebbe causare problemi come mal di testa, stanchezza, irritazione delle vie respiratorie e riduzione del comfort ambientale."
+      isAnomalo[0] = true
+    }
+
+    if(list[1].Value < 980){ // Pressione
+      
+      stringValoreAnomalo += "<br>(Pressure) Valori di pressione troppo bassi e possono essere associati a disturbi come mal di testa, stanchezza, dolori articolari e maggiore sensibilità ai cambiamenti meteorologici."
+      isAnomalo[1] = true
+    } else if (list[1].Value > 1030){
+
+      stringValoreAnomalo += "<br>(Pressure) Valori di pressione troppo alti e possono essere associati a disturbi come mal di testa, stanchezza e sensazione di aria stagnante o secca."
+      isAnomalo[1] = true
+    }
+
+    if(list[2].Value > 2000){ // CO2
+
+      stringValoreAnomalo += "<br>(CO2) Valori di CO2 troppo alti, l’aria è poco ventilata e potrebbe causare problemi come mal di testa, sonnolenza, vertigini, riduzione della concentrazione e confusione."
+      isAnomalo[2] = true
+    }
+
+    if(list[3].Value > 50){ // PM10
+
+      stringValoreAnomalo += "<br>(PM10) Valori di PM10 troppo alti, l’aria è inquinata e potrebbe causare problemi come irritazione delle vie respiratorie, tosse e disturbi a carico di polmoni e cuore."
+      isAnomalo[3] = true
+    }
+
+    if(list[4].Value > 15){ // PM25
+
+      stringValoreAnomalo += "<br>(PM25) Valori di PM25 troppo alti, l’aria è inquinata e potrebbe causare problemi molto seri come infiammazione polmonare, peggioramento dell’asma e disturbi cardiovascolari."
+      isAnomalo[4] = true
+    }
+
+    if(list[5].Value > 20){ // PM1
+
+      stringValoreAnomalo += "<br>(PM1) Valori di PM1 troppo alti, l’aria è inquinata e potrebbe causare problemi come infiammazione profonda delle vie respiratorie, irritazione polmonare e possibili effetti sul sistema cardiovascolare."
+      isAnomalo[5] = true
+    }
+
+    if(list[6].Value > 1000){ //VOC
+
+      stringValoreAnomalo += "<br>(VOC) Valori di VOC troppo alti, l’aria è inquinata e potrebbe causare problemi come mal di testa, stanchezza, irritazione di occhi e vie respiratorie e nausea."
+      isAnomalo[6] = true
+    }
+
+    if(list[7].Value > 2000){ //CO2 Equivalent
+
+      stringValoreAnomalo += "<br>(CO2 Equivalent) Valori di CO2 equivalente troppo alti, l’aria è poco ventilata e potrebbe causare problemi come mal di testa, sonnolenza, vertigini, riduzione della concentrazione e confusione."
+      isAnomalo[7] = true
+    }
+
+    if(list[8].Value < 30){ //Umidità
+
+      stringValoreAnomalo += "<br>(Humidity) Valori di umidità troppo bassi e possono causare problemi come pelle secca, irritazione agli occhi e alle vie respiratorie e fastidio generale."
+      isAnomalo[8] = true
+    } else if(list[8].Value > 60){
+
+      stringValoreAnomalo += "<br>(Humidity) Valori di umidità troppo alti e possono causare problemi come sensazione di aria pesante, disagio, affaticamento e aumento del rischio di muffe e cattiva qualità dell’aria interna."
+      isAnomalo[8] = true
+    }
+
+    if(list[9].Value < 0){ //temp2
+
+      stringValoreAnomalo += "<br>(temp2) Valori di temperatura troppo bassi e possono causare sensazione di freddo intenso, rischio di ipotermia in caso di esposizione prolungata e disagio generale."
+      isAnomalo[9] = true
+    } else if(list[9].Value > 35){
+
+      stringValoreAnomalo += "<br>(temp2) Valori di temperatura troppo alti e possono causare rischio di disidratazione, colpi di calore e forte stress termico in caso di esposizione prolungata."
+      isAnomalo[9] = true
+    }
+
+    if(list[10].Value < 18){ //Temperature
+
+      stringValoreAnomalo += "<br>(Temperature) Valori di temperatura troppo bassi e possono causare sensazione di freddo, disagio, rigidità muscolare e riduzione del comfort ambientale."
+      isAnomalo[10] = true
+    } else if(list[10].Value > 26){
+
+      stringValoreAnomalo += "<br>(Temperature) Valori di temperatura troppo alti e possono causare sensazione di caldo, affaticamento, disidratazione e riduzione della concentrazione."
+      isAnomalo[10] = true
+    }
+
+    if(list[11].Value == 1){ //LED_Event
+
+      stringValoreAnomalo += "<br>(LED_Event) È attivo un evento di segnalazione del dispositivo, potrebbe indicare uno stato di avviso, errore o allarme da verificare nel sistema."
+      isAnomalo[11] = true
+    }
+
+    // Scrive l'avviso (il valore di stringValoreAnomalo) all'interno dell'HTML
+    valoreAnomalo.innerHTML = stringValoreAnomalo
+
+    for(i = 0; i < list.length; i++){
+
+      if(isAnomalo[i]){
+      
+      renderSensori += `<div class="anomaly sensor-card">
+      <div class="sensor-name">${list[i].EventName ?? '—'}</div>
+      <div class="sensor-value">${list[i].Value+" "+list[i].Unity}</div></div>`
+      } else {
+
+      renderSensori += `<div class="correct sensor-card">
+      <div class="sensor-name">${list[i].EventName ?? '—'}</div>
+      <div class="sensor-value">${list[i].Value+" "+list[i].Unity}</div></div>`
+      }
+    }
+
+    grid.innerHTML = renderSensori;
+  }
 }
 
 /* GRAPH */
