@@ -425,6 +425,7 @@ function renderSensors(data) {
     // Scrive l'avviso (il valore di stringValoreAnomalo) all'interno dell'HTML
     valoreAnomalo.innerHTML = stringValoreAnomalo
 
+    // Loop che scrive il render di ogni singolo sensore all'interno di renderSensori e cambia il colore del testo in base al valore (Se è corretto o anomalo)
     for(i = 0; i < list.length; i++){
 
       if(isAnomalo[i]){
@@ -439,7 +440,7 @@ function renderSensors(data) {
       <div class="sensor-value">${list[i].Value+" "+list[i].Unity}</div></div>`
       }
     }
-
+    // Scrive il codice per renderizzare i sensori all'interno dell'HTML
     grid.innerHTML = renderSensori;
   }
 }
@@ -487,10 +488,10 @@ window.addEventListener('DOMContentLoaded', async () => {
     renderSensors(sensors);
 
     document.getElementById('last-update').textContent =
-      'Aggiornato ' + new Date().toLocaleTimeString('it-IT', {
-        hour:'2-digit',
-        minute:'2-digit'
-      });
+    'Aggiornato ' + new Date().toLocaleTimeString('it-IT', {
+    hour:'2-digit',
+    minute:'2-digit'
+    });
 
   } catch (e) {
     console.error(e);
