@@ -247,9 +247,6 @@ function renderSensors(data) {
     <div class="sensor-card">
       <div class="sensor-name">${s.EventName ?? '—'}</div>
       <div class="sensor-value">${fmtVal(s.Value)}</div>
-      <div class="sensor-time">
-        ${s.LastMeasureTs ? new Date(s.LastMeasureTs).toLocaleTimeString('it-IT') : '—'}
-      </div>
     </div>
   `).join('');
 }
