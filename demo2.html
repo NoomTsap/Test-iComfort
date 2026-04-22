@@ -28,7 +28,10 @@
 
 body {
   background: var(--bg);
+  color: var(--text);
   font-family: var(--sans);
+  font-size: 30px;
+  min-height: 100vh;
   overflow-x: hidden;
 }
 
@@ -106,7 +109,11 @@ main {
   font-size: 16px;
   letter-spacing: 0.2em;
   color: var(--muted);
+  text-transform: uppercase;
   margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 /* SENSOR GRID */
@@ -171,6 +178,26 @@ main {
   image-rendering: -webkit-optimize-contrast;
 }
 
+.graph-loading {
+  font-family: var(--mono);
+  font-size: 20px;
+  color: var(--muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.spinner {
+  width: 24px; height: 24px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
 .error-msg {
   font-family: var(--mono);
   color: var(--warn);
@@ -198,7 +225,10 @@ main {
   <div>
     <div class="section-label">Temperatura · 48h (Grafico generato dalla richiesta HTTPS)</div>
     <div class="graph-container" id="graph-container">
-      Caricamento grafico...
+      <div class="graph-loading" id="graph-loading">
+        <div class="spinner"></div>
+          Caricamento grafico...
+        </div>
     </div>
   </div>
 
@@ -274,8 +304,6 @@ async function loadGraph() {
   const container = document.getElementById('graph-container');
 
   try {
-    container.innerHTML = 'Caricamento...';
-
     const data = await fetchGraph();
     const img = data?.Contents?.[0]?.Payload;
 
