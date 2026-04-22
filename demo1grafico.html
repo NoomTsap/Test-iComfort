@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>iComfort · Sensori</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Oswald:wght@200..700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #ffffff;
+  --surface: #f4f5f7;
+  --border: #cacacc;
+
+  --accent: #3eb3a8;
+  --accent-glow: rgba(62,179,168,0.4);
+
+  --warn: #ffaa00;
+
+  --muted: #6c8f8c;
+
+  --mono: 'Oswald', monospace;
+  --sans: 'Nunito', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 30px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* SCANLINE */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,212,170,0.015) 2px,
+    rgba(0,212,170,0.015) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* HEADER */
+header {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.logo {
+  font-family: var(--mono);
+  font-size: 28px;
+  color: var(--accent);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.status-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent-glow);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 10px var(--accent-glow); }
+  50% { opacity: 0.5; box-shadow: 0 0 4px var(--accent-glow); }
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+}
+
+#last-update {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 25px;
+}
+
+/* BOTTONE */
+.ricarica-pagina {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  background: var(--surface);
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ricarica-pagina:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+
+.ricarica-pagina:active {
+  transform: scale(0.97);
+}
+
+.ricarica-pagina:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-glow);
+}
+
+/* MAIN */
+main {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.section-label {
+  font-family: var(--mono);
+  font-size: 16px;
+  letter-spacing: 0.2em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.bad-values{
+  font-family: var(--mono);
+  font-size: 14px;
+  color: red;
+  margin-top: 10px;
+}
+
+/* GRAPH */
+.graph-container {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  min-height: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 10px;
+}
+
+.graph-container img {
+  width: 100%;
+  max-width: 900px;   /* <-- limita la dimensione */
+  height: auto;
+  display: block;
+  image-rendering: auto;
+  filter: saturate(1.1) contrast(1.05);
+  image-rendering: -webkit-optimize-contrast;
+}
+
+.graph-loading {
+  font-family: var(--mono);
+  font-size: 20px;
+  color: var(--muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.spinner {
+  width: 24px; height: 24px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.error-msg {
+  font-family: var(--mono);
+  color: var(--warn);
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">iComfort · Live Monitor</div>
+  <div class="header-right">
+    <span id="last-update"></span>
+    <div class="status-dot"></div>
+    <button type="button" class="ricarica-pagina" id="ricarica-pagina">Ricarica pagina</button>
+  </div>
+</header>
+
+<main>
+  <div>
+    <div class="section-label">Temperatura · 48h (Grafico generato dalla richiesta HTTPS)</div>
+    <div class="graph-container" id="graph-container">
+      <div class="graph-loading" id="graph-loading">
+        <div class="spinner"></div>
+          Caricamento grafico...
+        </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+const API_KEY  = '1CFB6C41-D487-44C8-B042-FB5B81563748';
+const GUID     = 'FF4EDEB4-D5B6-4B78-A8A1-B8F95FA079D7';
+const BASE_URL = 'https://api.icomfort.it';
+
+// Bottone per ricaricare la pagina
+document.getElementById("ricarica-pagina").addEventListener("click", function () {location.reload();});
+
+/* GRAPH */
+async function fetchGraph() {
+  const res = await fetch(`${BASE_URL}/GraphEngine/api/Graph/GetSpaceDataGraph`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Api-Key': API_KEY
+    },
+    body: JSON.stringify({
+      Tags: ['Temperature','Actual'],
+      ElementGuid: GUID,
+      Params: { StartDate: '48 Hours Ago', EndDate: 'Now' },
+      GetBase64Image: false
+    })
+  });
+
+  return res.json();
+}
+
+async function loadGraph() {
+  const container = document.getElementById('graph-container');
+
+  try {
+    const data = await fetchGraph();
+    const img = data?.Contents?.[0]?.Payload;
+
+    if (!img) throw new Error('No image');
+
+    container.innerHTML = `<img src="${img}?t=${Date.now()}">`;
+
+  } catch (e) {
+    container.innerHTML = `<div class="error-msg">Errore grafico</div>`;
+    console.error(e);
+  }
+}
+
+/* INIT */
+window.addEventListener('DOMContentLoaded', async () => {
+  try {
+    document.getElementById('last-update').textContent =
+    'Aggiornato ' + new Date().toLocaleTimeString('it-IT', {
+    hour:'2-digit',
+    minute:'2-digit'
+    });
+
+  } catch (e) {
+    console.error(e);
+  }
+
+  loadGraph();
+});
+</script>
+
+</body>
+</html>
