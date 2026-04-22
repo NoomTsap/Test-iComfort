@@ -116,6 +116,13 @@ main {
   gap: 8px;
 }
 
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
 /* SENSOR GRID */
 #sensor-grid {
   display: grid;
