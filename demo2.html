@@ -11,7 +11,6 @@
 :root {
   --bg: #ffffff;
   --surface: #f4f5f7;
-  --surface-2: #f0f0f2;
   --border: #cacacc;
 
   --accent: #3eb3a8;
@@ -19,7 +18,6 @@
 
   --warn: #ffaa00;
 
-  --text: #d7ecea;
   --muted: #6c8f8c;
 
   --mono: 'Oswald', monospace;
@@ -95,7 +93,7 @@ header {
   font-size: 25px;
 }
 
-/* GRID */
+/* MAIN */
 main {
   padding: 16px 20px;
   display: flex;
@@ -155,16 +153,22 @@ main {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 4px;
-  min-height: 200px;
+  min-height: 260px;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  padding: 10px;
 }
 
 .graph-container img {
   width: 100%;
+  max-width: 900px;   /* <-- limita la dimensione */
+  height: auto;
+  display: block;
+  image-rendering: auto;
   filter: saturate(1.1) contrast(1.05);
+  image-rendering: -webkit-optimize-contrast;
 }
 
 .error-msg {
@@ -180,7 +184,7 @@ main {
   <div class="logo">iComfort · Live Monitor</div>
   <div class="header-right">
     <span id="last-update">—</span>
-    <div class="status-dot" id="status-dot"></div>
+    <div class="status-dot"></div>
   </div>
 </header>
 
@@ -192,7 +196,7 @@ main {
   </div>
 
   <div>
-    <div class="section-label">Temperatura · 48h (Grafico generato dalla richiesta HTTP)</div>
+    <div class="section-label">Temperatura · 48h (Grafico)</div>
     <div class="graph-container" id="graph-container">
       Caricamento grafico...
     </div>
@@ -205,13 +209,7 @@ const API_KEY  = '1CFB6C41-D487-44C8-B042-FB5B81563748';
 const GUID     = 'FF4EDEB4-D5B6-4B78-A8A1-B8F95FA079D7';
 const BASE_URL = 'https://api.icomfort.it';
 
-function fmtTime(ts) {
-  try {
-    const d = new Date(ts);
-    return d.toLocaleString('it-IT', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
-  } catch { return '—'; }
-}
-
+/* FORMAT */
 function fmtVal(v) {
   if (v === null || v === undefined) return '—';
   const n = parseFloat(v);
@@ -219,32 +217,44 @@ function fmtVal(v) {
   return n % 1 === 0 ? n.toFixed(0) : n.toFixed(1);
 }
 
-/* SENSORI */
+/* FETCH SENSORS */
 async function fetchSensors() {
   const res = await fetch(`${BASE_URL}/api/Measure/GetLastMeasuresByEntity?guid=${GUID}`, {
     headers: { 'Api-Key': API_KEY }
   });
+
   return res.json();
 }
 
+/* RENDER SENSORS */
 function renderSensors(data) {
   const grid = document.getElementById('sensor-grid');
 
-  if (!Array.isArray(data)) {
+  const list = data?.MeasuresList;
+
+  if (!Array.isArray(list)) {
     grid.innerHTML = '<div class="error-msg">Errore dati</div>';
+    console.log('API response:', data);
     return;
   }
 
-  grid.innerHTML = data.map(s => `
+  if (list.length === 0) {
+    grid.innerHTML = '<div class="error-msg">Nessuna misura disponibile</div>';
+    return;
+  }
+
+  grid.innerHTML = list.map(s => `
     <div class="sensor-card">
-      <div class="sensor-name">${s.EventName}</div>
-      <div class="sensor-value">${s.Value}</div>
-      <div class="sensor-time">${new Date(s.LastMeasureTs).toLocaleTimeString()}</div>
+      <div class="sensor-name">${s.EventName ?? '—'}</div>
+      <div class="sensor-value">${fmtVal(s.Value)}</div>
+      <div class="sensor-time">
+        ${s.LastMeasureTs ? new Date(s.LastMeasureTs).toLocaleTimeString('it-IT') : '—'}
+      </div>
     </div>
   `).join('');
 }
 
-/* GRAFICO API */
+/* GRAPH */
 async function fetchGraph() {
   const res = await fetch(`${BASE_URL}/GraphEngine/api/Graph/GetSpaceDataGraph`, {
     method: 'POST',
@@ -270,7 +280,6 @@ async function loadGraph() {
     container.innerHTML = 'Caricamento...';
 
     const data = await fetchGraph();
-
     const img = data?.Contents?.[0]?.Payload;
 
     if (!img) throw new Error('No image');
@@ -283,20 +292,24 @@ async function loadGraph() {
   }
 }
 
-/* INIT SICURO */
+/* INIT */
 window.addEventListener('DOMContentLoaded', async () => {
   try {
     const sensors = await fetchSensors();
     renderSensors(sensors);
+
     document.getElementById('last-update').textContent =
-      'Aggiornato ' + new Date().toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'});
+      'Aggiornato ' + new Date().toLocaleTimeString('it-IT', {
+        hour:'2-digit',
+        minute:'2-digit'
+      });
+
   } catch (e) {
     console.error(e);
   }
 
   loadGraph();
 });
-
 </script>
 
 </body>
