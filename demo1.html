@@ -222,7 +222,7 @@ main {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  padding: 10px;
+  padding: 20px;
 }
 
 .graph-container:hover{
@@ -231,11 +231,11 @@ main {
 
 .graph-container img {
   width: 100%;
-  max-width: 900px;   /* <-- limita la dimensione */
+  max-width: 1000px;   /* <-- limita la dimensione */
   height: auto;
   display: block;
   image-rendering: auto;
-  filter: saturate(1.1) contrast(1.05);
+  filter: saturate(10) contrast(1);
   image-rendering: -webkit-optimize-contrast;
 }
 
@@ -250,11 +250,11 @@ main {
 }
 
 .spinner {
-  width: 24px; height: 24px;
-  border: 2px solid var(--border);
-  border-top-color: var(--accent);
+  width: 100px; height: 100px;
+  border: 10px solid var(--border);
+  border-top-color: var(--muted);
   border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+  animation: spin 1s linear infinite;
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -471,7 +471,7 @@ async function fetchGraph() {
     body: JSON.stringify({
       Tags: ['Temperature','Actual'],
       ElementGuid: GUID,
-      Params: { StartDate: '48 Hours Ago', EndDate: 'Now' },
+      Params: { StartDate: '24 Hours Ago', EndDate: 'Now' },
       GetBase64Image: false
     })
   });
