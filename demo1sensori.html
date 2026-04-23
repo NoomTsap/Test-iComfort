@@ -281,85 +281,85 @@ function renderSensors(data) {
   } else {
 
     // If che controllano se i valori sono troppo alti/bassi e danno un'avviso in caso lo siano
-    if(list[0].Value > 1000){ // NuvapIndex
+    if(list[0].Value < 3){ // NuvapIndex
       
-      stringValoreAnomalo += "<br>(NuvapIndex) Valori dell’indice Nuvap troppo alti, l’aria è inquinata e potrebbe causare problemi come mal di testa, stanchezza, irritazione delle vie respiratorie e riduzione del comfort ambientale."
+      stringValoreAnomalo += "<br>(NuvapIndex) Valore dell’indice Nuvap troppo ridotto, l’aria è inquinata e potrebbe causare problemi come mal di testa, stanchezza, irritazione delle vie respiratorie e riduzione del comfort ambientale."
       isAnomalo[0] = true
     }
 
     if(list[1].Value < 980){ // Pressione
       
-      stringValoreAnomalo += "<br>(Pressure) Valori di pressione troppo bassi e possono essere associati a disturbi come mal di testa, stanchezza, dolori articolari e maggiore sensibilità ai cambiamenti meteorologici."
+      stringValoreAnomalo += "<br>(Pressure) Valori di pressione troppo ridotti e possono essere associati a disturbi come mal di testa, stanchezza, dolori articolari e maggiore sensibilità ai cambiamenti meteorologici."
       isAnomalo[1] = true
     } else if (list[1].Value > 1030){
 
-      stringValoreAnomalo += "<br>(Pressure) Valori di pressione troppo alti e possono essere associati a disturbi come mal di testa, stanchezza e sensazione di aria stagnante o secca."
+      stringValoreAnomalo += "<br>(Pressure) Valori di pressione troppo elevati e possono essere associati a disturbi come mal di testa, stanchezza e sensazione di aria stagnante o secca."
       isAnomalo[1] = true
     }
 
     if(list[2].Value > 2000){ // CO2
 
-      stringValoreAnomalo += "<br>(CO2) Valori di CO2 troppo alti, l’aria è poco ventilata e potrebbe causare problemi come mal di testa, sonnolenza, vertigini, riduzione della concentrazione e confusione."
+      stringValoreAnomalo += "<br>(CO2) Valori di CO2 troppo elevati, l’aria è poco ventilata e potrebbe causare problemi come mal di testa, sonnolenza, vertigini, riduzione della concentrazione e confusione."
       isAnomalo[2] = true
     }
 
     if(list[3].Value > 50){ // PM10
 
-      stringValoreAnomalo += "<br>(PM10) Valori di PM10 troppo alti, l’aria è inquinata e potrebbe causare problemi come irritazione delle vie respiratorie, tosse e disturbi a carico di polmoni e cuore."
+      stringValoreAnomalo += "<br>(PM10) Valori di PM10 troppo elevati, l’aria è inquinata e potrebbe causare problemi come irritazione delle vie respiratorie, tosse e disturbi a carico di polmoni e cuore."
       isAnomalo[3] = true
     }
 
     if(list[4].Value > 15){ // PM25
 
-      stringValoreAnomalo += "<br>(PM25) Valori di PM25 troppo alti, l’aria è inquinata e potrebbe causare problemi molto seri come infiammazione polmonare, peggioramento dell’asma e disturbi cardiovascolari."
+      stringValoreAnomalo += "<br>(PM25) Valori di PM25 troppo elevati, l’aria è inquinata e potrebbe causare problemi molto seri come infiammazione polmonare, peggioramento dell’asma e disturbi cardiovascolari."
       isAnomalo[4] = true
     }
 
     if(list[5].Value > 20){ // PM1
 
-      stringValoreAnomalo += "<br>(PM1) Valori di PM1 troppo alti, l’aria è inquinata e potrebbe causare problemi come infiammazione profonda delle vie respiratorie, irritazione polmonare e possibili effetti sul sistema cardiovascolare."
+      stringValoreAnomalo += "<br>(PM1) Valori di PM1 troppo elevati, l’aria è inquinata e potrebbe causare problemi come infiammazione profonda delle vie respiratorie, irritazione polmonare e possibili effetti sul sistema cardiovascolare."
       isAnomalo[5] = true
     }
 
     if(list[6].Value > 1000){ //VOC
 
-      stringValoreAnomalo += "<br>(VOC) Valori di VOC troppo alti, l’aria è inquinata e potrebbe causare problemi come mal di testa, stanchezza, irritazione di occhi e vie respiratorie e nausea."
+      stringValoreAnomalo += "<br>(VOC) Valori di VOC troppo elevati, l’aria è inquinata e potrebbe causare problemi come mal di testa, stanchezza, irritazione di occhi e vie respiratorie e nausea."
       isAnomalo[6] = true
     }
 
     if(list[7].Value > 2000){ //CO2 Equivalent
 
-      stringValoreAnomalo += "<br>(CO2 Equivalent) Valori di CO2 equivalente troppo alti, l’aria è poco ventilata e potrebbe causare problemi come mal di testa, sonnolenza, vertigini, riduzione della concentrazione e confusione."
+      stringValoreAnomalo += "<br>(CO2 Equivalent) Valori di CO2 equivalente troppo elevati, l’aria è poco ventilata e potrebbe causare problemi come mal di testa, sonnolenza, vertigini, riduzione della concentrazione e confusione."
       isAnomalo[7] = true
     }
 
     if(list[8].Value < 30){ //Umidità
 
-      stringValoreAnomalo += "<br>(Humidity) Valori di umidità troppo bassi e possono causare problemi come pelle secca, irritazione agli occhi e alle vie respiratorie e fastidio generale."
+      stringValoreAnomalo += "<br>(Humidity) Valori di umidità troppo ridotti e possono causare problemi come pelle secca, irritazione agli occhi e alle vie respiratorie e fastidio generale."
       isAnomalo[8] = true
     } else if(list[8].Value > 60){
 
-      stringValoreAnomalo += "<br>(Humidity) Valori di umidità troppo alti e possono causare problemi come sensazione di aria pesante, disagio, affaticamento e aumento del rischio di muffe e cattiva qualità dell’aria interna."
+      stringValoreAnomalo += "<br>(Humidity) Valori di umidità troppo elevati e possono causare problemi come sensazione di aria pesante, disagio, affaticamento e aumento del rischio di muffe e cattiva qualità dell’aria interna."
       isAnomalo[8] = true
     }
 
     if(list[9].Value < 0){ //temp2
 
-      stringValoreAnomalo += "<br>(temp2) Valori di temperatura troppo bassi e possono causare sensazione di freddo intenso, rischio di ipotermia in caso di esposizione prolungata e disagio generale."
+      stringValoreAnomalo += "<br>(temp2) Valori di temperatura troppo ridotti e possono causare sensazione di freddo intenso, rischio di ipotermia in caso di esposizione prolungata e disagio generale."
       isAnomalo[9] = true
     } else if(list[9].Value > 35){
 
-      stringValoreAnomalo += "<br>(temp2) Valori di temperatura troppo alti e possono causare rischio di disidratazione, colpi di calore e forte stress termico in caso di esposizione prolungata."
+      stringValoreAnomalo += "<br>(temp2) Valori di temperatura troppo elevati e possono causare rischio di disidratazione, colpi di calore e forte stress termico in caso di esposizione prolungata."
       isAnomalo[9] = true
     }
 
     if(list[10].Value < 18){ //Temperature
 
-      stringValoreAnomalo += "<br>(Temperature) Valori di temperatura troppo bassi e possono causare sensazione di freddo, disagio, rigidità muscolare e riduzione del comfort ambientale."
+      stringValoreAnomalo += "<br>(Temperature) Valori di temperatura troppo ridotti e possono causare sensazione di freddo, disagio, rigidità muscolare e riduzione del comfort ambientale."
       isAnomalo[10] = true
     } else if(list[10].Value > 26){
 
-      stringValoreAnomalo += "<br>(Temperature) Valori di temperatura troppo alti e possono causare sensazione di caldo, affaticamento, disidratazione e riduzione della concentrazione."
+      stringValoreAnomalo += "<br>(Temperature) Valori di temperatura troppo elevati e possono causare sensazione di caldo, affaticamento, disidratazione e riduzione della concentrazione."
       isAnomalo[10] = true
     }
 
