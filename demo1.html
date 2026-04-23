@@ -357,11 +357,11 @@ function renderSensors(data) {
 
     if(list[1].Value < 980){ // Pressione
       
-      stringValoreAnomalo += "<br>(Pressure) Valori di pressione troppo ridotti e possono essere associati a disturbi come mal di testa, stanchezza, dolori articolari e maggiore sensibilità ai cambiamenti meteorologici."
+      stringValoreAnomalo += "<br>(Pressure) Valori di pressione troppo ridotti che possono essere causare disturbi come mal di testa, stanchezza, dolori articolari e maggiore sensibilità ai cambiamenti meteorologici."
       isAnomalo[1] = true
     } else if (list[1].Value > 1030){
 
-      stringValoreAnomalo += "<br>(Pressure) Valori di pressione troppo elevati e possono essere associati a disturbi come mal di testa, stanchezza e sensazione di aria stagnante o secca."
+      stringValoreAnomalo += "<br>(Pressure) Valori di pressione troppo elevati che possono essere causare disturbi come mal di testa, stanchezza e sensazione di aria stagnante o secca."
       isAnomalo[1] = true
     }
 
