@@ -12,7 +12,7 @@
   --surface: #f4f5f7;
   --border: #cacacc;
 
-  --accent: #3eb3a8;
+  --accent: #3eba8;
   --accent-glow: rgba(62,179,168,0.4);
 
   --warn: #ffaa00;
@@ -336,7 +336,7 @@ function renderSensors(data) {
   } else {
 
     // If che controllano se i valori sono troppo alti/bassi e danno un'avviso in caso lo siano
-    if(list[0].Value < 3){ // NuvapIndex
+    if(list[0].Value <= 3){ // NuvapIndex
       
       stringValoreAnomalo += "<br>(NuvapIndex) Valore dell’indice Nuvap troppo ridotto, l’aria è inquinata e potrebbe causare problemi come mal di testa, stanchezza, irritazione delle vie respiratorie e riduzione del comfort ambientale."
       isAnomalo[0] = true
