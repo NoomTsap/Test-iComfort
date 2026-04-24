@@ -9,15 +9,15 @@
 <style>
 :root {
   --bg: #ffffff;
-  --surface: #f4f5f7;
+  --surface: #e7fffd;
   --border: #cacacc;
 
-  --accent: #3eb3a8;
+  --accent: #308b82;
   --accent-glow: rgba(62,179,168,0.4);
 
   --warn: #ffaa00;
 
-  --muted: #6c8f8c;
+  --muted: #3eb3a8;
 
   --mono: 'Oswald', monospace;
   --sans: 'Nunito', sans-serif;
@@ -56,7 +56,7 @@ header {
   justify-content: space-between;
   padding: 12px 20px;
   border-bottom: 1px solid var(--border);
-  background: var(--surface);
+  background: #edfffe;
 }
 
 .logo {
@@ -95,14 +95,14 @@ header {
   font-size: 25px;
 }
 
-/* BOTTONE */
+/* BOTTONE RICARICA PAGINA */
 .ricarica-pagina {
   font-family: var(--mono);
   font-size: 12px;
   letter-spacing: 0.15em;
   text-transform: uppercase;
-  background: var(--surface);
-  color: var(--muted);
+  background: var(--muted);
+  color: var(--surface);
   border: 1px solid var(--border);
   border-radius: 4px;
   padding: 8px 12px;
@@ -115,18 +115,12 @@ header {
 
 .ricarica-pagina:hover {
   border-color: var(--accent);
-  color: var(--accent);
-  box-shadow: 0 0 10px var(--accent-glow);
+  color: var(--bg);
+  box-shadow: 2px 2px 1px var(--accent);
 }
 
 .ricarica-pagina:active {
   transform: scale(0.97);
-}
-
-.ricarica-pagina:focus {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px var(--accent-glow);
 }
 
 /* MAIN */
@@ -156,17 +150,10 @@ main {
   background: var(--border);
 }
 
-.bad-values{
-  font-family: var(--mono);
-  font-size: 14px;
-  color: red;
-  margin-top: 10px;
-}
-
 /* SENSOR GRID */
 
-.anomaly { color: red; }
-.correct { color: green; }
+.anomaly { color: #ad0000; }
+.correct { color: #3eb3a8; }
 
 #sensor-grid {
   display: grid;
@@ -186,10 +173,29 @@ main {
   border-color: var(--accent);
 }
 
+.anomaly-card{
+  background: #ff9090;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 12px;
+  transition: 0.2s;
+}
+
+.anomaly-card:hover{
+  border-color:#af0000
+}
+
 .sensor-name {
   font-family: var(--mono);
   font-size: 12px;
   color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.anomaly-name{
+  font-family: var(--mono);
+  font-size: 12px;
+  color: #880000;
   margin-bottom: 6px;
 }
 
@@ -199,11 +205,11 @@ main {
   /*color: #222;*/
 }
 
-.sensor-time {
+.bad-values{
   font-family: var(--mono);
-  font-size: 10px;
-  color: var(--muted);
-  margin-top: 8px;
+  font-size: 14px;
+  color: #ad0000;
+  margin-top: 10px;
 }
 
 .error-msg {
@@ -227,7 +233,7 @@ main {
 <main>
 
   <div>
-    <div class="section-label">Ultime rilevazioni</div>
+    <div class="section-label" id="orario">Ultime rilevazioni</div>
     <div id="sensor-grid"></div>
     <div class="bad-values" id="bad-values"></div>
   </div>
@@ -269,6 +275,9 @@ function renderSensors(data) {
   const valoreAnomalo = document.getElementById('bad-values');
   var stringValoreAnomalo = "";
 
+  var orario = document.getElementById('orario')
+  orario.innerHTML = "Ultime rilevazioni (" + (list[0].LastMeasure).slice(11) + ")"
+
   if (!Array.isArray(list)) {
 
     grid.innerHTML = '<div class="error-msg">Errore dati</div>';
@@ -289,11 +298,11 @@ function renderSensors(data) {
 
     if(list[1].Value < 980){ // Pressione
       
-      stringValoreAnomalo += "<br>(Pressure) Valori di pressione troppo ridotti e possono essere associati a disturbi come mal di testa, stanchezza, dolori articolari e maggiore sensibilità ai cambiamenti meteorologici."
+      stringValoreAnomalo += "<br>(Pressure) Valori di pressione troppo ridotti che possono essere causare disturbi come mal di testa, stanchezza, dolori articolari e maggiore sensibilità ai cambiamenti meteorologici."
       isAnomalo[1] = true
     } else if (list[1].Value > 1030){
 
-      stringValoreAnomalo += "<br>(Pressure) Valori di pressione troppo elevati e possono essere associati a disturbi come mal di testa, stanchezza e sensazione di aria stagnante o secca."
+      stringValoreAnomalo += "<br>(Pressure) Valori di pressione troppo elevati che possono essere causare disturbi come mal di testa, stanchezza e sensazione di aria stagnante o secca."
       isAnomalo[1] = true
     }
 
@@ -375,19 +384,23 @@ function renderSensors(data) {
     // Loop che scrive il render di ogni singolo sensore all'interno di renderSensori e cambia il colore del testo in base al valore (Se è corretto o anomalo)
     for(i = 0; i < list.length; i++){
 
-      if(isAnomalo[i]){
-      
-      renderSensori += `<div class="anomaly sensor-card">
-      <div class="sensor-name">${list[i].EventName ?? '—'}</div>
-      <div class="sensor-value">${list[i].Value+" "+list[i].Unity}</div></div>`
+      if(i == 6){
+        
+        renderSensori += '<p><p><p><p><p>'
+      }
+
+      if(!isAnomalo[i]){
+
+        renderSensori += `<div class="correct sensor-card">
+        <div class="sensor-name">${list[i].EventName ?? '—'}</div>
+        <div class="sensor-value">${list[i].Value+" "+list[i].Unity}</div></div>`
       } else {
 
-      renderSensori += `<div class="correct sensor-card">
-      <div class="sensor-name">${list[i].EventName ?? '—'}</div>
-      <div class="sensor-value">${list[i].Value+" "+list[i].Unity}</div></div>`
+        renderSensori += `<div class="anomaly anomaly-card">
+        <div class="anomaly-name">${list[i].EventName ?? '—'}</div>
+        <div class="sensor-value">${list[i].Value+" "+list[i].Unity}</div></div>`
       }
     }
-
     // Scrive il codice per renderizzare i sensori all'interno dell'HTML
     grid.innerHTML = renderSensori;
   }
