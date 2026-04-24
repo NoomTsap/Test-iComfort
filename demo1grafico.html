@@ -9,15 +9,15 @@
 <style>
 :root {
   --bg: #ffffff;
-  --surface: #f4f5f7;
+  --surface: #e7fffd;
   --border: #cacacc;
 
-  --accent: #3eb3a8;
+  --accent: #308b82;
   --accent-glow: rgba(62,179,168,0.4);
 
   --warn: #ffaa00;
 
-  --muted: #6c8f8c;
+  --muted: #3eb3a8;
 
   --mono: 'Oswald', monospace;
   --sans: 'Nunito', sans-serif;
@@ -56,7 +56,7 @@ header {
   justify-content: space-between;
   padding: 12px 20px;
   border-bottom: 1px solid var(--border);
-  background: var(--surface);
+  background: #edfffe;
 }
 
 .logo {
@@ -95,14 +95,14 @@ header {
   font-size: 25px;
 }
 
-/* BOTTONE */
+/* BOTTONE RICARICA PAGINA */
 .ricarica-pagina {
   font-family: var(--mono);
   font-size: 12px;
   letter-spacing: 0.15em;
   text-transform: uppercase;
-  background: var(--surface);
-  color: var(--muted);
+  background: var(--muted);
+  color: var(--surface);
   border: 1px solid var(--border);
   border-radius: 4px;
   padding: 8px 12px;
@@ -115,18 +115,12 @@ header {
 
 .ricarica-pagina:hover {
   border-color: var(--accent);
-  color: var(--accent);
-  box-shadow: 0 0 10px var(--accent-glow);
+  color: var(--bg);
+  box-shadow: 2px 2px 1px var(--accent);
 }
 
 .ricarica-pagina:active {
   transform: scale(0.97);
-}
-
-.ricarica-pagina:focus {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px var(--accent-glow);
 }
 
 /* MAIN */
@@ -156,13 +150,6 @@ main {
   background: var(--border);
 }
 
-.bad-values{
-  font-family: var(--mono);
-  font-size: 14px;
-  color: red;
-  margin-top: 10px;
-}
-
 /* GRAPH */
 .graph-container {
   background: var(--surface);
@@ -173,16 +160,20 @@ main {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  padding: 10px;
+  padding: 20px;
+}
+
+.graph-container:hover{
+  border-color: var(--accent);
 }
 
 .graph-container img {
   width: 100%;
-  max-width: 900px;   /* <-- limita la dimensione */
+  max-width: 1000px;   /* <-- limita la dimensione */
   height: auto;
   display: block;
   image-rendering: auto;
-  filter: saturate(1.1) contrast(1.05);
+  filter: saturate(10) contrast(1);
   image-rendering: -webkit-optimize-contrast;
 }
 
@@ -197,11 +188,11 @@ main {
 }
 
 .spinner {
-  width: 24px; height: 24px;
-  border: 2px solid var(--border);
-  border-top-color: var(--accent);
+  width: 100px; height: 100px;
+  border: 10px solid var(--border);
+  border-top-color: var(--muted);
   border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+  animation: spin 1s linear infinite;
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -225,8 +216,9 @@ main {
 </header>
 
 <main>
+
   <div>
-    <div class="section-label">Temperatura · 24h (Grafico generato tramite richiesta HTTPS)</div>
+    <div class="section-label">Temperatura · 24h (Grafico generato dalla richiesta HTTPS)</div>
     <div class="graph-container" id="graph-container">
       <div class="graph-loading" id="graph-loading">
         <div class="spinner"></div>
@@ -245,6 +237,14 @@ const BASE_URL = 'https://api.icomfort.it';
 // Bottone per ricaricare la pagina
 document.getElementById("ricarica-pagina").addEventListener("click", function () {location.reload();});
 
+/* FORMAT */
+function fmtVal(v) {
+  if (v === null || v === undefined) return '—';
+  const n = parseFloat(v);
+  if (isNaN(n)) return String(v);
+  return n % 1 === 0 ? n.toFixed(0) : n.toFixed(1);
+}
+
 /* GRAPH */
 async function fetchGraph() {
   const res = await fetch(`${BASE_URL}/GraphEngine/api/Graph/GetSpaceDataGraph`, {
@@ -256,7 +256,7 @@ async function fetchGraph() {
     body: JSON.stringify({
       Tags: ['Temperature','Actual'],
       ElementGuid: GUID,
-      Params: { StartDate: '48 Hours Ago', EndDate: 'Now' },
+      Params: { StartDate: '24 Hours Ago', EndDate: 'Now' },
       GetBase64Image: false
     })
   });
@@ -284,6 +284,7 @@ async function loadGraph() {
 /* INIT */
 window.addEventListener('DOMContentLoaded', async () => {
   try {
+
     document.getElementById('last-update').textContent =
     'Aggiornato ' + new Date().toLocaleTimeString('it-IT', {
     hour:'2-digit',
