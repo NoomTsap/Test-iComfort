@@ -335,8 +335,6 @@ function renderSensors(data) {
   var orario = document.getElementById('orario')
   orario.innerHTML = "Ultime rilevazioni (" + (list[0].LastMeasure).slice(11) + ")"
 
-  console.log(list)
-
   if (!Array.isArray(list)) {
 
     grid.innerHTML = '<div class="error-msg">Errore dati</div>';
@@ -443,16 +441,21 @@ function renderSensors(data) {
     // Loop che scrive il render di ogni singolo sensore all'interno di renderSensori e cambia il colore del testo in base al valore (Se è corretto o anomalo)
     for(i = 0; i < list.length; i++){
 
-      if(isAnomalo[i]){
-      
-      renderSensori += `<div class="anomaly anomaly-card">
-      <div class="anomaly-name">${list[i].EventName ?? '—'}</div>
-      <div class="sensor-value">${list[i].Value+" "+list[i].Unity}</div></div>`
+      if(i == 6){
+        
+        renderSensori += '<p><p><p><p><p>'
+      }
+
+      if(!isAnomalo[i]){
+
+        renderSensori += `<div class="correct sensor-card">
+        <div class="sensor-name">${list[i].EventName ?? '—'}</div>
+        <div class="sensor-value">${list[i].Value+" "+list[i].Unity}</div></div>`
       } else {
 
-      renderSensori += `<div class="correct sensor-card">
-      <div class="sensor-name">${list[i].EventName ?? '—'}</div>
-      <div class="sensor-value">${list[i].Value+" "+list[i].Unity}</div></div>`
+        renderSensori += `<div class="anomaly anomaly-card">
+        <div class="anomaly-name">${list[i].EventName ?? '—'}</div>
+        <div class="sensor-value">${list[i].Value+" "+list[i].Unity}</div></div>`
       }
     }
     // Scrive il codice per renderizzare i sensori all'interno dell'HTML
