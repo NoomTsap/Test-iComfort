@@ -384,11 +384,6 @@ function renderSensors(data) {
     // Loop che scrive il render di ogni singolo sensore all'interno di renderSensori e cambia il colore del testo in base al valore (Se è corretto o anomalo)
     for(i = 0; i < list.length; i++){
 
-      if(i == 6){
-        
-        renderSensori += '<p><p><p><p><p>'
-      }
-
       if(!isAnomalo[i]){
 
         renderSensori += `<div class="correct sensor-card">
