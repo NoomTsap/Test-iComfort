@@ -211,14 +211,14 @@ main {
   <div class="header-right">
     <span id="last-update"></span>
     <div class="status-dot"></div>
-    <button type="button" class="ricarica-pagina" id="ricarica-pagina">Ricarica pagina</button>
+    <button type="button" class="ricarica-pagina" id="ricarica-pagina">Reload Page</button>
   </div>
 </header>
 
 <main>
 
   <div>
-    <div class="section-label">Temperatura · 24h (Grafico generato dalla richiesta HTTPS)</div>
+    <div class="section-label">Temperature · 24h</div>
     <div class="graph-container" id="graph-container">
       <div class="graph-loading" id="graph-loading">
         <div class="spinner"></div>
@@ -284,9 +284,9 @@ async function loadGraph() {
 /* INIT */
 window.addEventListener('DOMContentLoaded', async () => {
   try {
-
+    
     document.getElementById('last-update').textContent =
-    'Aggiornato ' + new Date().toLocaleTimeString('it-IT', {
+    'Updated at ' + new Date().toLocaleTimeString('it-IT', {
     hour:'2-digit',
     minute:'2-digit'
     });
