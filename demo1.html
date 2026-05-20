@@ -212,6 +212,34 @@ main {
   margin-top: 10px;
 }
 
+/* BOTTONE TROUBLESHOOTING */
+.troubleshoot {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  background: #880000;
+  color: #ffacac;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.troubleshoot:hover {
+  border-color: #500000;
+  color: var(--bg);
+  box-shadow: 2px 2px 1px #500000;
+}
+
+.troubleshoot:active {
+  transform: scale(0.97);
+}
+
 /* GRAPH */
 .graph-container {
   background: var(--surface);
@@ -273,20 +301,21 @@ main {
   <div class="header-right">
     <span id="last-update"></span>
     <div class="status-dot"></div>
-    <button type="button" class="ricarica-pagina" id="ricarica-pagina">Ricarica pagina</button>
+    <button type="button" class="ricarica-pagina" id="ricarica-pagina">Reload Page</button>
   </div>
 </header>
 
 <main>
 
   <div>
-    <div class="section-label" id="orario">Ultime rilevazioni</div>
+    <div class="section-label" id="orario"></div>
     <div id="sensor-grid"></div>
     <div class="bad-values" id="bad-values"></div>
+    <div id="troubleshooting"></div>
   </div>
 
   <div>
-    <div class="section-label">Temperatura · 24h (Grafico generato dalla richiesta HTTPS)</div>
+    <div class="section-label">Temperature · 24h</div>
     <div class="graph-container" id="graph-container">
       <div class="graph-loading" id="graph-loading">
         <div class="spinner"></div>
@@ -329,11 +358,12 @@ function renderSensors(data) {
   var renderSensori = ""
 
   var isAnomalo = [false, false, false, false, false, false, false, false, false, false, false, false]
+  var troubleshooting = false
   const valoreAnomalo = document.getElementById('bad-values');
   var stringValoreAnomalo = "";
 
   var orario = document.getElementById('orario')
-  orario.innerHTML = "Ultime rilevazioni (" + (list[0].LastMeasure).slice(11) + ")"
+  orario.innerHTML = "Latest Measurements (" + (list[0].LastMeasure).slice(11) + ")"
 
   if (!Array.isArray(list)) {
 
@@ -355,85 +385,87 @@ function renderSensors(data) {
 
     if(list[1].Value < 980){ // Pressione
       
-      stringValoreAnomalo += "<br>(Pressure) Valori di pressione troppo ridotti che possono essere causare disturbi come mal di testa, stanchezza, dolori articolari e maggiore sensibilità ai cambiamenti meteorologici."
+      stringValoreAnomalo += "<br>(Pressure) Excessively low pressure values can cause issues such as headaches, fatigue, joint pain, and increased sensitivity to weather changes."
       isAnomalo[1] = true
     } else if (list[1].Value > 1030){
 
-      stringValoreAnomalo += "<br>(Pressure) Valori di pressione troppo elevati che possono essere causare disturbi come mal di testa, stanchezza e sensazione di aria stagnante o secca."
+      stringValoreAnomalo += "<br>(Pressure) Excessively high pressure values can cause issues such as headaches, fatigue, and a feeling of stuffy or dry air."
       isAnomalo[1] = true
     }
 
     if(list[2].Value > 2000){ // CO2
 
-      stringValoreAnomalo += "<br>(CO2) Valori di CO2 troppo elevati, l’aria è poco ventilata e potrebbe causare problemi come mal di testa, sonnolenza, vertigini, riduzione della concentrazione e confusione."
+      stringValoreAnomalo += "<br>(CO2) Excessively high CO2 levels indicate poor ventilation and may cause issues such as headaches, drowsiness, dizziness, reduced concentration, and confusion."
       isAnomalo[2] = true
     }
 
     if(list[3].Value > 50){ // PM10
 
-      stringValoreAnomalo += "<br>(PM10) Valori di PM10 troppo elevati, l’aria è inquinata e potrebbe causare problemi come irritazione delle vie respiratorie, tosse e disturbi a carico di polmoni e cuore."
+      stringValoreAnomalo += "<br>(PM10) Excessively high PM10 levels indicate that the air is polluted and may cause issues such as irritation of the respiratory tract, coughing, and disorders affecting the lungs and heart."
       isAnomalo[3] = true
     }
 
     if(list[4].Value > 15){ // PM25
 
-      stringValoreAnomalo += "<br>(PM25) Valori di PM25 troppo elevati, l’aria è inquinata e potrebbe causare problemi molto seri come infiammazione polmonare, peggioramento dell’asma e disturbi cardiovascolari."
+      stringValoreAnomalo += "<br>(PM25) Excessively high PM25 levels indicate that the air is polluted and may cause issues such as pulmonary inflammation, worsening of asthma, and cardiovascular problems."
       isAnomalo[4] = true
     }
 
     if(list[5].Value > 20){ // PM1
 
-      stringValoreAnomalo += "<br>(PM1) Valori di PM1 troppo elevati, l’aria è inquinata e potrebbe causare problemi come infiammazione profonda delle vie respiratorie, irritazione polmonare e possibili effetti sul sistema cardiovascolare."
+      stringValoreAnomalo += "<br>(PM1) Excessively high PM1 levels indicate that the air is polluted and may cause issues such as deep inflammation of the respiratory tract, lung irritation, and possible effects on the cardiovascular system."
       isAnomalo[5] = true
     }
 
     if(list[6].Value > 1000){ //VOC
 
-      stringValoreAnomalo += "<br>(VOC) Valori di VOC troppo elevati, l’aria è inquinata e potrebbe causare problemi come mal di testa, stanchezza, irritazione di occhi e vie respiratorie e nausea."
+      stringValoreAnomalo += "<br>(VOC) Excessively high VOC levels indicate that the air is polluted and may cause issues such as headaches, fatigue, irritation of the eyes and respiratory tract, and nausea."
       isAnomalo[6] = true
     }
 
     if(list[7].Value > 2000){ //CO2 Equivalent
 
-      stringValoreAnomalo += "<br>(CO2 Equivalent) Valori di CO2 equivalente troppo elevati, l’aria è poco ventilata e potrebbe causare problemi come mal di testa, sonnolenza, vertigini, riduzione della concentrazione e confusione."
+      stringValoreAnomalo += "<br>(CO2 Equivalent) Excessively high CO2 equivalent values can cause issues such as headaches, drowsiness, dizziness, reduced concentration, and confusion."
       isAnomalo[7] = true
     }
 
     if(list[8].Value < 30){ //Umidità
 
-      stringValoreAnomalo += "<br>(Humidity) Valori di umidità troppo ridotti e possono causare problemi come pelle secca, irritazione agli occhi e alle vie respiratorie e fastidio generale."
+      stringValoreAnomalo += "<br>(Humidity) Excessively low humidity values can cause issues such as dry skin, irritation to the eyes and respiratory tract, and general discomfort."
       isAnomalo[8] = true
     } else if(list[8].Value > 60){
 
-      stringValoreAnomalo += "<br>(Humidity) Valori di umidità troppo elevati e possono causare problemi come sensazione di aria pesante, disagio, affaticamento e aumento del rischio di muffe e cattiva qualità dell’aria interna."
+      stringValoreAnomalo += "<br>(Humidity) Excessively high humidity values can cause issues such as a feeling of heavy air, discomfort, fatigue, and an increased risk of mold and poor indoor air quality."
       isAnomalo[8] = true
     }
 
     if(list[9].Value < 0){ //temp2
 
-      stringValoreAnomalo += "<br>(temp2) Valori di temperatura troppo ridotti e possono causare sensazione di freddo intenso, rischio di ipotermia in caso di esposizione prolungata e disagio generale."
+      stringValoreAnomalo += "<br>(temp2) Excessively low temperature values can cause a sensation of intense cold, a risk of hypothermia in case of prolonged exposure, and general discomfort."
       isAnomalo[9] = true
     } else if(list[9].Value > 35){
 
-      stringValoreAnomalo += "<br>(temp2) Valori di temperatura troppo elevati e possono causare rischio di disidratazione, colpi di calore e forte stress termico in caso di esposizione prolungata."
+      stringValoreAnomalo += "<br>(temp2) Excessively high temperature values can cause a risk of dehydration, heatstroke, and severe thermal stress in case of prolonged exposure."
       isAnomalo[9] = true
     }
 
     if(list[10].Value < 18){ //Temperature
 
-      stringValoreAnomalo += "<br>(Temperature) Valori di temperatura troppo ridotti e possono causare sensazione di freddo, disagio, rigidità muscolare e riduzione del comfort ambientale."
+      stringValoreAnomalo += "<br>(Temperature) Excessively low temperature values can cause a feeling of cold, discomfort, muscle stiffness, and reduced environmental comfort."
       isAnomalo[10] = true
     } else if(list[10].Value > 26){
 
-      stringValoreAnomalo += "<br>(Temperature) Valori di temperatura troppo elevati e possono causare sensazione di caldo, affaticamento, disidratazione e riduzione della concentrazione."
+      stringValoreAnomalo += "<br>(Temperature) Excessively high temperature values can cause a feeling of heat, fatigue, dehydration, and reduced concentration."
       isAnomalo[10] = true
     }
 
     if(list[11].Value == 1){ //Led_Event
 
-      stringValoreAnomalo += "<br>(Led_Event) È attivo un evento di segnalazione del dispositivo, potrebbe indicare uno stato di avviso, errore o allarme da verificare nel sistema."
+      stringValoreAnomalo += "<br>(Led_Event) A device reporting event is active; it may indicate a warning, error, or alarm condition that should be checked in the system."
       isAnomalo[11] = true
     }
+
+
 
     // Scrive l'avviso (il valore di stringValoreAnomalo) all'interno dell'HTML
     valoreAnomalo.innerHTML = stringValoreAnomalo
@@ -451,6 +483,12 @@ function renderSensors(data) {
         renderSensori += `<div class="anomaly anomaly-card">
         <div class="anomaly-name">${list[i].EventName ?? '—'}</div>
         <div class="sensor-value">${list[i].Value+" "+list[i].Unity}</div></div>`
+
+        if(!troubleshooting){
+
+          document.getElementById('troubleshooting').innerHTML = `<br><button class="troubleshoot" onclick='window.location.href="https://carear.app/#/i/43r3xi8beek"''>START TROUBLESHOOTING</button>`
+          troubleshooting = true
+        }
       }
     }
     // Scrive il codice per renderizzare i sensori all'interno dell'HTML
@@ -501,7 +539,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     renderSensors(sensors);
 
     document.getElementById('last-update').textContent =
-    'Aggiornato ' + new Date().toLocaleTimeString('it-IT', {
+    'Updated at ' + new Date().toLocaleTimeString('it-IT', {
     hour:'2-digit',
     minute:'2-digit'
     });
